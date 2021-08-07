@@ -1,13 +1,12 @@
 ---
-title: Bucket
 type: docs
+title: Bucket
 menu: components
 ---
 
 # Bucket
 
-The bucket component of Thanos is a set of commands to inspect data in object storage buckets.
-It is normally run as a stand alone command to aid with troubleshooting.
+The bucket component of Thanos is a set of commands to inspect data in object storage buckets. It is normally run as a stand alone command to aid with troubleshooting.
 
 Example:
 
@@ -23,14 +22,12 @@ config:
   bucket: example-bucket
 ```
 
-Bucket can be extended to add more subcommands that will be helpful when working with object storage buckets
-by adding a new command within `/cmd/thanos/bucket.go`
-
+Bucket can be extended to add more subcommands that will be helpful when working with object storage buckets by adding a new command within `/cmd/thanos/bucket.go`
 
 ## Deployment
+
 ## Flags
 
-[embedmd]:# (flags/bucket.txt $)
 ```$
 usage: thanos bucket [<flags>] <command> [<args> ...]
 
@@ -80,7 +77,6 @@ Example:
 $ thanos bucket verify --gcs.bucket example-bucket
 ```
 
-[embedmd]:# (flags/bucket_verify.txt)
 ```txt
 usage: thanos bucket verify [<flags>]
 
@@ -137,7 +133,6 @@ Example:
 $ thanos bucket ls -o json --gcs.bucket example-bucket
 ```
 
-[embedmd]:# (flags/bucket_ls.txt)
 ```txt
 usage: thanos bucket ls [<flags>]
 
@@ -174,11 +169,11 @@ Flags:
 `bucket inspect` is used to inspect buckets in a detailed way.
 
 Example:
+
 ```
 $ thanos bucket inspect -l environment=\"prod\"
 ```
 
-[embedmd]:# (flags/bucket_inspect.txt)
 ```txt
 usage: thanos bucket inspect [<flags>]
 

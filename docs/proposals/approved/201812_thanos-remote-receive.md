@@ -1,9 +1,9 @@
 ---
-title: Thanos Remote Write
 type: proposal
-menu: proposals
+title: Thanos Remote Write
 status: accepted
 owner: brancz
+menu: proposals
 ---
 
 ## Summary
@@ -31,7 +31,6 @@ The Thanos receiver component seamlessly integrates into the rest of the Thanos 
 Instead of directly scraping metrics, however, the Thanos receiver accepts Prometheus remote-write requests, and writes these into a local instance of the Prometheus tsdb. Once successfully committed to the tenant's tsdbs, the requests returns successfully. To prevent data leaking at the database level, each tenant has an individual tsdb instance, meaning a single Thanos receiver may manage multiple tsdb instances. The receiver answers Thanos store API requests and uploads built blocks of the Prometheus tsdb. Implementation-wise, this just requires wiring up existing components. As tenant's data within object storage are separate objects, it may be enough separation to have a single bucket for all tenants, however, this architecture supports any setup of tenant to object storage bucket combination.
 
 In a minimal setup the system would look like the following:
-
 
 ```
                  +
@@ -95,7 +94,7 @@ Using the tenant's ID in the hash will help to distribute the load across receiv
 hash(string(tenant_id) + sort(timeseries.labelset).join())
 ```
 
-The hashing function used is the same one as used by Prometheus’: [xxHash][xxHash]. Sorting of labels is necessary, in order to ensure that a unique time-series always has the same hash.
+The hashing function used is the same one as used by Prometheus’: [xxHash](http://cyan4973.github.io/xxHash/). Sorting of labels is necessary, in order to ensure that a unique time-series always has the same hash.
 
 While the routing functionality could be a separate component, we choose to have it in the receiver to allow for a simpler setup.
 
@@ -180,7 +179,3 @@ Decisions of the design have consequences some of which will show themselves in 
 * For compaction to work as described in this proposal, vertical compaction in tsdb needs to be possible. Implemented but not merged yet: https://github.com/prometheus/tsdb/pull/370
 * If downtime of ingestion, as in the described `503` for intermediate downtime, and Prometheus resuming when the backend becomes healthy again, turns out not to be an option, we could attempt to duplicate all write requests to 3 (or configurable amount) replicas, where a write request needs to be accepted by at least 2 replicas, this way we can ensure no downtime of ingestion. This may require additional compaction and deduplication of object storage as well as significantly increase infrastructure cost.
 * Additional safeguards may need to be put in place to ensure that hashring resizes do not occur on failed nodes, only once they have recovered and have successfully uploaded their blocks.
-
-[xxhash]: http://cyan4973.github.io/xxHash/
-[prom-label-proxy]: https://github.com/openshift/prom-label-proxy
-
