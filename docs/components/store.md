@@ -1,13 +1,12 @@
 ---
-title: Store
 type: docs
+title: Store
 menu: components
 ---
 
 # Store
 
-The `thanos store` command (also known as Store Gateway) implements the Store API on top of historical data in an object storage bucket. It acts primarily as an API gateway and therefore does not need significant amounts of local disk space. It joins a Thanos cluster on startup and advertises the data it can access.
-It keeps a small amount of information about all remote blocks on local disk and keeps it in sync with the bucket. This data is generally safe to delete across restarts at the cost of increased startup times.
+The `thanos store` command (also known as Store Gateway) implements the Store API on top of historical data in an object storage bucket. It acts primarily as an API gateway and therefore does not need significant amounts of local disk space. It joins a Thanos cluster on startup and advertises the data it can access. It keeps a small amount of information about all remote blocks on local disk and keeps it in sync with the bucket. This data is generally safe to delete across restarts at the cost of increased startup times.
 
 ```bash
 thanos store \
@@ -27,7 +26,6 @@ In general about 1MB of local disk space is required per TSDB block stored in th
 
 ## Flags
 
-[embedmd]:# (flags/store.txt $)
 ```$
 usage: thanos store [<flags>]
 
@@ -220,7 +218,7 @@ Filtering is done on a Chunk level, so Thanos Store might still return Samples w
 
 Thanos Store Gateway supports an index cache to speed up postings and series lookups from TSDB blocks indexes. Two types of caches are supported:
 
-- `in-memory` (_default_)
+- `in-memory` (*default*)
 - `memcached`
 
 ### In-memory index cache
@@ -228,8 +226,6 @@ Thanos Store Gateway supports an index cache to speed up postings and series loo
 The `in-memory` index cache is enabled by default and its max size can be configured through the flag `--index-cache-size`.
 
 Alternatively, the `in-memory` index cache can also by configured using `--index-cache.config-file` to reference to the configuration file or `--index-cache.config` to put yaml config directly:
-
-[embedmd]: # "../flags/config_index_cache_in_memory.txt yaml"
 
 ```yaml
 type: IN-MEMORY
@@ -247,8 +243,6 @@ All the settings are **optional**:
 
 The `memcached` index cache allows to use [Memcached](https://memcached.org) as cache backend. This cache type is configured using `--index-cache.config-file` to reference to the configuration file or `--index-cache.config` to put yaml config directly:
 
-[embedmd]: # "../flags/config_index_cache_memcached.txt yaml"
-
 ```yaml
 type: MEMCACHED
 config:
@@ -265,7 +259,7 @@ config:
 
 The **required** settings are:
 
-- `addresses`: list of memcached addresses, that will get resolved with the [DNS service discovery](../service-discovery.md/#dns-service-discovery) provider.
+- `addresses`: list of memcached addresses, that will get resolved with the [DNS service discovery](../service-discovery.md#dns-service-discovery) provider.
 
 While the remaining settings are **optional**:
 
@@ -327,13 +321,11 @@ In order to query series inside blocks from object storage, Store Gateway has to
 - symbols table to unintern string values
 - postings offset for posting lookup
 
-In order to achieve so, on startup for each block `index-header` is built from pieces of original block's index and stored on disk.
-Such `index-header` file is then mmaped and used by Store Gateway.
+In order to achieve so, on startup for each block `index-header` is built from pieces of original block's index and stored on disk. Such `index-header` file is then mmaped and used by Store Gateway.
 
 ### Format (version 1)
 
-The following describes the format of the `index-header` file found in each block store gateway local directory.
-It is terminated by a table of contents which serves as an entry point into the index.
+The following describes the format of the `index-header` file found in each block store gateway local directory. It is terminated by a table of contents which serves as an entry point into the index.
 
 ```
 ┌─────────────────────────────┬───────────────────────────────┐
@@ -365,8 +357,7 @@ See [Posting Offset Table](https://github.com/prometheus/prometheus/blob/d782387
 
 ### TOC
 
-The table of contents serves as an entry point to the entire index and points to various sections in the file.
-If a reference is zero, it indicates the respective section does not exist and empty results should be returned upon lookup.
+The table of contents serves as an entry point to the entire index and points to various sections in the file. If a reference is zero, it indicates the respective section does not exist and empty results should be returned upon lookup.
 
 ```
 ┌─────────────────────────────────────────┐
