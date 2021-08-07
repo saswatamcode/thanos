@@ -19,20 +19,15 @@ The philosophy of Thanos and our community is borrowing much from UNIX philosoph
 
 If you encounter any issue or you have an idea to improve, please:
 
-* Search through Google and [existing open and closed GitHub Issues](https://github.com/thanos-io/thanos/issues) for the
-answer first. If you find relevant topic, please comment on the issue.
-* If not found, please add an issue to [GitHub issues](https://github.com/thanos-io/thanos/issues). Please provide
-all relevant information as template suggest.
-* If you have a quick question you might want to also ask on #thanos or #thanos-dev slack channel in the CNCF workspace.
-We are recommending, using GitHub issues for issues and feedback, because GitHub issues are track-able.
+* Search through Google and [existing open and closed GitHub Issues](https://github.com/thanos-io/thanos/issues) for the answer first. If you find relevant topic, please comment on the issue.
+* If not found, please add an issue to [GitHub issues](https://github.com/thanos-io/thanos/issues). Please provide all relevant information as template suggest.
+* If you have a quick question you might want to also ask on #thanos or #thanos-dev slack channel in the CNCF workspace. We are recommending, using GitHub issues for issues and feedback, because GitHub issues are track-able.
 
 If you encounter security vulnerability, please refer to [Reporting a Vulnerability process](SECURITY.md)
 
 ## Adding New Features / Components
 
-When contributing not obvious change to Thanos repository, please first
-discuss the change you wish to make via issue or slack, or any other
-method with the owners of this repository before making a change.
+When contributing not obvious change to Thanos repository, please first discuss the change you wish to make via issue or slack, or any other method with the owners of this repository before making a change.
 
 Adding a large new feature or/and component to Thanos should be done by first creating a [proposal](docs/proposals) document outlining the design decisions of the change, motivations for the change, and any alternatives that might have been considered.
 
@@ -96,12 +91,10 @@ $ git push origin <your_branch_for_new_pr>
 7. If you don't have a live object store ready add this envvar to skip tests for these:
 - THANOS_TEST_OBJSTORE_SKIP=GCS,S3,AZURE,SWIFT,COS,ALIYUNOSS
 
-If you skip all of these, the store specific tests will be run against memory object storage only.
-CI runs GCS and inmem tests only for now. Not having these variables will produce auth errors against GCS, AWS, Azure or COS tests.
+If you skip all of these, the store specific tests will be run against memory object storage only. CI runs GCS and inmem tests only for now. Not having these variables will produce auth errors against GCS, AWS, Azure or COS tests.
 
 8. If your change affects users (adds or removes feature) consider adding the item to [CHANGELOG](CHANGELOG.md)
-9. You may merge the Pull Request in once you have the sign-off of at least one developers with write access, or if you
-   do not have permission to do that, you may request the second reviewer to merge it for you.
+9. You may merge the Pull Request in once you have the sign-off of at least one developers with write access, or if you do not have permission to do that, you may request the second reviewer to merge it for you.
 10. If you feel like your PR waits too long for a review, feel free to ping [`#thanos-prs`](https://slack.cncf.io/) channel on our slack for review!
 
 ## Dependency management

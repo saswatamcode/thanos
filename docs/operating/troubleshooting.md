@@ -1,8 +1,8 @@
 ---
-title: Troubleshooting
 type: docs
-menu: operating
+title: Troubleshooting
 slug: /troubleshooting.md
+menu: operating
 ---
 
 Work in progress (:
