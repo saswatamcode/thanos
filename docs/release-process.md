@@ -1,8 +1,8 @@
 ---
-title: Release Process
 type: docs
-menu: thanos
+title: Release Process
 slug: /release-process.md
+menu: thanos
 ---
 
 This page describes the release cadence and process for Thanos project.
@@ -13,9 +13,7 @@ NOTE: As [Semantic Versioning](http://semver.org/spec/v2.0.0.html) states all 0.
 
 ## Cadence
 
-We aim for regular and strict one release per *6 weeks*. 6 weeks is counter from first release candidate to another.
-This means that there is no *code freeze* or anything like that. We plan to stick to the exact 6 weeks, so there is no rush
-into being within release (except bug fixes).
+We aim for regular and strict one release per *6 weeks*. 6 weeks is counter from first release candidate to another. This means that there is no *code freeze* or anything like that. We plan to stick to the exact 6 weeks, so there is no rush into being within release (except bug fixes).
 
 No feature should block release.
 
@@ -28,23 +26,23 @@ Release shepherd responsibilities:
 * Perform releases (from first RC to actual release).
 * Announce all releases on all communication channels.
 
-| Release   | Time of first RC         | Shepherd (GitHub handle) |
-|-----------|--------------------------|--------------------------|
-| v0.11.0   | (planned) 2020.02.19     | TBD                      |
-| v0.10.0   | 2020.01.08               | `@GiedriusS`             |
-| v0.9.0    | 2019.11.26               | `@bwplotka`              |
-| v0.8.0    | 2019.10.09               | `@bwplotka`              |
-| v0.7.0    | 2019.08.28               | `@domgreen`              |
-| v0.6.0    | 2019.07.12               | `@GiedriusS`             |
-| v0.5.0    | 2019.06.31               | `@bwplotka`              |
+| Release | Time of first RC     | Shepherd (GitHub handle) |
+|---------|----------------------|--------------------------|
+| v0.11.0 | (planned) 2020.02.19 | TBD                      |
+| v0.10.0 | 2020.01.08           | `@GiedriusS`             |
+| v0.9.0  | 2019.11.26           | `@bwplotka`              |
+| v0.8.0  | 2019.10.09           | `@bwplotka`              |
+| v0.7.0  | 2019.08.28           | `@domgreen`              |
+| v0.6.0  | 2019.07.12           | `@GiedriusS`             |
+| v0.5.0  | 2019.06.31           | `@bwplotka`              |
 
 # For maintainers: Cutting individual release
 
 Process of releasing a *minor* Thanos version:
 1. Release `v<major>.<minor+1>.0-rc.0`
-1. If after 3 work days there is no major bug, release `v<major>.<minor>.0`
-1. If within 3 work days there is major bug, let's triage it to fix it and then release `v<major>.<minor>.0-rc.++` Go to step 2.
-1. Do patch release if needed for any bugs afterwards. Use same `release-xxx` branch and migrate fixes to master.
+2. If after 3 work days there is no major bug, release `v<major>.<minor>.0`
+3. If within 3 work days there is major bug, let's triage it to fix it and then release `v<major>.<minor>.0-rc.++` Go to step 2.
+4. Do patch release if needed for any bugs afterwards. Use same `release-xxx` branch and migrate fixes to master.
 
 ## How to release a version
 
@@ -52,47 +50,44 @@ Release is happening on separate `release-<major>.<minor>` branch.
 
 1. Prepare PR to branch `release-<major>.<minor>` that will start minor release branch and prepare changes to cut release.
 
-  For release candidate just reuse same branch and rebase it on every candidate until the actual release happens.
+For release candidate just reuse same branch and rebase it on every candidate until the actual release happens.
 
-1. Update [CHANGELOG file](/CHANGELOG.md)
+1. Update [CHANGELOG file](../CHANGELOG.md)
 
-  Note that `CHANGELOG.md` should only document changes relevant to users of Thanos, including external API changes, performance improvements, and new features. Do not document changes of internal interfaces, code refactorings and clean-ups, changes to the build process, etc. People interested in these are asked to refer to the git history.
-  Format is described in `CHANGELOG.md`.
+Note that `CHANGELOG.md` should only document changes relevant to users of Thanos, including external API changes, performance improvements, and new features. Do not document changes of internal interfaces, code refactorings and clean-ups, changes to the build process, etc. People interested in these are asked to refer to the git history. Format is described in `CHANGELOG.md`.
 
-  The whole release from release candidate `rc.0` to actual release should have exactly the same section. We don't separate
-  what have changed between release candidates.
+The whole release from release candidate `rc.0` to actual release should have exactly the same section. We don't separate what have changed between release candidates.
 
 1. Double check backward compatibility:
-    1. *In case of version after `v1+.y.z`*, double check if none of the changes break API compatibility. This should be done in PR review process, but double check is good to have.
-    1. In case of `v0.y.z`, document all incompatibilities in changelog.
+   1. *In case of version after `v1+.y.z`*, double check if none of the changes break API compatibility. This should be done in PR review process, but double check is good to have.
+   2. In case of `v0.y.z`, document all incompatibilities in changelog.
 
-1. Update tutorials:
-    1. Update the Thanos version used in the [tutorials](../tutorials) manifests.
-    1. In case of any breaking changes or necessary updates adjust the manifests
-       so the tutorial stays up to date.
-    1. Update the [scripts/quickstart.sh](../scripts/quickstart.sh) script if needed.
+2. Update tutorials:
+   1. Update the Thanos version used in the [tutorials](../tutorials) manifests.
+   2. In case of any breaking changes or necessary updates adjust the manifests so the tutorial stays up to date.
+   3. Update the [scripts/quickstart.sh](../scripts/quickstart.sh) script if needed.
 
-1. After review, merge the PR and immediately after this tag a version:
+3. After review, merge the PR and immediately after this tag a version:
 
-    ```bash
-    $ tag=x.y.z
-    $ git tag -s "v${tag}" -m "v${tag}"
-    $ git push origin "v${tag}"
-    ```
+   ```bash
+   $ tag=x.y.z
+   $ git tag -s "v${tag}" -m "v${tag}"
+   $ git push origin "v${tag}"
+   ```
 
-    Signing a tag with a GPG key is appreciated, but in case you can't add a GPG key to your Github account using the following [procedure](https://help.github.com/articles/generating-a-gpg-key/), you can replace the `-s` flag by `-a` flag of the `git tag` command to only annotate the tag without signing.
+   Signing a tag with a GPG key is appreciated, but in case you can't add a GPG key to your Github account using the following [procedure](https://help.github.com/articles/generating-a-gpg-key/), you can replace the `-s` flag by `-a` flag of the `git tag` command to only annotate the tag without signing.
 
- 1. Once a tag is created, the release process through CircleCI will be triggered for this tag.
+4. Once a tag is created, the release process through CircleCI will be triggered for this tag.
 
- 1. You must create a Github Release using the UI for this tag, as otherwise CircleCI will not be able to upload tarballs for this tag. Also, you must create the Github Release using a Github user that has granted access rights to CircleCI. List of maintainers is available [here](/MAINTAINERS.md)
+5. You must create a Github Release using the UI for this tag, as otherwise CircleCI will not be able to upload tarballs for this tag. Also, you must create the Github Release using a Github user that has granted access rights to CircleCI. List of maintainers is available [here](../MAINTAINERS.md)
 
- 1. Go to the releases page of the project, click on the `Draft a new release` button and select the tag you just pushed. Describe release and post relevant entry from changelog. Click `Save draft` rather than `Publish release` at this time. (This will prevent the release being visible before it has got the binaries attached to it.)
+6. Go to the releases page of the project, click on the `Draft a new release` button and select the tag you just pushed. Describe release and post relevant entry from changelog. Click `Save draft` rather than `Publish release` at this time. (This will prevent the release being visible before it has got the binaries attached to it.)
 
- 1. Once tarballs are published on release page, you can click `Publish` and release is complete.
+7. Once tarballs are published on release page, you can click `Publish` and release is complete.
 
- 1. Announce `#thanos` slack channel.
+8. Announce `#thanos` slack channel.
 
- 1. Pull commits from release branch to master branch for non `rc` releases.
+9. Pull commits from release branch to master branch for non `rc` releases.
 
 ## Pre-releases (release candidates)
 
