@@ -1,13 +1,12 @@
 ---
-title: Bucket
 type: docs
+title: Bucket
 menu: components
 ---
 
 # Bucket
 
-The bucket component of Thanos is a set of commands to inspect data in object storage buckets.
-It is normally run as a stand alone command to aid with troubleshooting.
+The bucket component of Thanos is a set of commands to inspect data in object storage buckets. It is normally run as a stand alone command to aid with troubleshooting.
 
 Example:
 
@@ -23,14 +22,12 @@ config:
   bucket: example-bucket
 ```
 
-Bucket can be extended to add more subcommands that will be helpful when working with object storage buckets
-by adding a new command within `/cmd/thanos/bucket.go`.
-
+Bucket can be extended to add more subcommands that will be helpful when working with object storage buckets by adding a new command within `/cmd/thanos/bucket.go`.
 
 ## Deployment
+
 ## Flags
 
-[embedmd]:# (flags/bucket.txt $)
 ```$
 usage: thanos bucket [<flags>] <command> [<args> ...]
 
@@ -77,13 +74,13 @@ Subcommands:
 
 ```
 
-### Web 
+### Web
 
 `bucket web` is used to inspect bucket blocks in form of interactive web UI.
 
 This will start local webserver that will periodically update the view with given refresh.
 
-<img src="../img/bucket-web.jpg" class="img-fluid" alt="web" />
+<img src="../img/bucket-web.jpg" class="img-fluid" alt="web"/>
 
 Example:
 
@@ -91,7 +88,6 @@ Example:
 $ thanos bucket web --objstore.config-file="..."
 ```
 
-[embedmd]:# (flags/bucket_web.txt)
 ```txt
 usage: thanos bucket web [<flags>]
 
@@ -139,7 +135,6 @@ Example:
 $ thanos bucket verify --objstore.config-file="..."
 ```
 
-[embedmd]:# (flags/bucket_verify.txt)
 ```txt
 usage: thanos bucket verify [<flags>]
 
@@ -204,7 +199,6 @@ Example:
 $ thanos bucket ls -o json --objstore.config-file="..."
 ```
 
-[embedmd]:# (flags/bucket_ls.txt)
 ```txt
 usage: thanos bucket ls [<flags>]
 
@@ -245,11 +239,11 @@ Flags:
 `bucket inspect` is used to inspect buckets in a detailed way using stdout in ASCII table format.
 
 Example:
+
 ```
 $ thanos bucket inspect -l environment=\"prod\" --objstore.config-file="..."
 ```
 
-[embedmd]:# (flags/bucket_inspect.txt)
 ```txt
 usage: thanos bucket inspect [<flags>]
 

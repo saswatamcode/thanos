@@ -1,20 +1,19 @@
 ---
-title: Object Storage
 type: docs
-menu: thanos
+title: Object Storage
 slug: /storage.md
+menu: thanos
 ---
 
 # Object Storage
 
-Thanos supports any object stores that can be implemented against Thanos [objstore.Bucket interface](/pkg/objstore/objstore.go)
+Thanos supports any object stores that can be implemented against Thanos [objstore.Bucket interface](../pkg/objstore/objstore.go)
 
 All clients are configured using `--objstore.config-file` to reference to the configuration file or `--objstore.config` to put yaml config directly.
 
 ## How to use `config` flags?
 
-You can either pass YAML file defined below in `--objstore.config-file` or pass the YAML content directly using `--objstore.config`. 
-We recommend the latter as it gives an explicit static view of configuration for each component. It also saves you the fuss of creating and managing additional file.
+You can either pass YAML file defined below in `--objstore.config-file` or pass the YAML content directly using `--objstore.config`. We recommend the latter as it gives an explicit static view of configuration for each component. It also saves you the fuss of creating and managing additional file.
 
 Don't be afraid of multiline flags!
 
@@ -40,26 +39,26 @@ In Kubernetes it is as easy as (on Thanos sidecar example)::
 ## How to add a new client?
 
 1. Create new directory under `pkg/objstore/<provider>`
-2. Implement [objstore.Bucket interface](/pkg/objstore/objstore.go)
+2. Implement [objstore.Bucket interface](../pkg/objstore/objstore.go)
 3. Add `NewTestBucket` constructor for testing purposes, that creates and deletes temporary bucket.
-4. Use created `NewTestBucket` in [ForeachStore method](/pkg/objstore/objtesting/foreach.go) to ensure we can run tests against new provider. (In PR)
-5. RUN the [TestObjStoreAcceptanceTest](/pkg/objstore/objtesting/acceptance_e2e_test.go) against your provider to ensure it fits. Fix any found error until test passes. (In PR)
-6. Add client implementation to the factory in [factory](/pkg/objstore/client/factory.go) code. (Using as small amount of flags as possible in every command)
-7. Add client struct config to [bucketcfggen](/scripts/cfggen/main.go) to allow config auto generation.
+4. Use created `NewTestBucket` in [ForeachStore method](../pkg/objstore/objtesting/foreach.go) to ensure we can run tests against new provider. (In PR)
+5. RUN the [TestObjStoreAcceptanceTest](../pkg/objstore/objtesting/acceptance_e2e_test.go) against your provider to ensure it fits. Fix any found error until test passes. (In PR)
+6. Add client implementation to the factory in [factory](../pkg/objstore/client/factory.go) code. (Using as small amount of flags as possible in every command)
+7. Add client struct config to [bucketcfggen](../scripts/cfggen/main.go) to allow config auto generation.
 
 At that point, anyone can use your provider by spec.
 
-## Configuration 
+## Configuration
 
 Current object storage client implementations:
 
-| Provider             | Maturity | Auto-tested on CI | Maintainers |
-|----------------------|-------------------|-----------|---------------|
-| [Google Cloud Storage](#gcs) | Stable  (production usage)             | yes       | @bwplotka   |
-| [AWS/S3](#s3) | Stable  (production usage)               | yes        | @bwplotka          |
-| [Azure Storage Account](#azure) | Stable  (production usage) | yes       | @vglafirov   |
-| [OpenStack Swift](#openstack-swift)      | Beta  (working PoCs, testing usage)               | no        | @sudhi-vm   |
-| [Tencent COS](#tencent-cos)          | Beta  (testing usage)                   | no        | @jojohappy          |
+| Provider                            | Maturity                           | Auto-tested on CI | Maintainers |
+|-------------------------------------|------------------------------------|-------------------|-------------|
+| [Google Cloud Storage](#gcs)        | Stable (production usage)          | yes               | @bwplotka   |
+| [AWS/S3](#s3)                       | Stable (production usage)          | yes               | @bwplotka   |
+| [Azure Storage Account](#azure)     | Stable (production usage)          | yes               | @vglafirov  |
+| [OpenStack Swift](#openstack-swift) | Beta (working PoCs, testing usage) | no                | @sudhi-vm   |
+| [Tencent COS](#tencent-cos)         | Beta (testing usage)               | no                | @jojohappy  |
 
 NOTE: Currently Thanos requires strong consistency (write-read) for object store implementation.
 
@@ -71,7 +70,6 @@ You can configure an S3 bucket as an object store with YAML, either by passing t
 
 NOTE: Minio client was mainly for AWS S3, but it can be configured against other S3-compatible object storages e.g Ceph
 
-[embedmd]:# (flags/config_bucket_s3.txt yaml)
 ```yaml
 type: S3
 config:
@@ -118,9 +116,9 @@ For debug and testing purposes you can set
 By default Thanos will try to retrieve credentials from the following sources:
 
 1. From config file if BOTH `access_key` and `secret_key` are present.
-1. From the standard AWS environment variable - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`
-1. From `~/.aws/credentials`
-1. IAM credentials retrieved from an instance profile.
+2. From the standard AWS environment variable - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`
+3. From `~/.aws/credentials`
+4. IAM credentials retrieved from an instance profile.
 
 NOTE: Getting access key from config file and secret key from other method (and vice versa) is not supported.
 
@@ -154,9 +152,7 @@ Example working AWS IAM policy for user:
 
 (No bucket policy)
 
-To test the policy, set env vars for S3 access for *empty, not used* bucket as well as:
-THANOS_SKIP_GCS_TESTS=true
-THANOS_ALLOW_EXISTING_BUCKET_USE=true
+To test the policy, set env vars for S3 access for *empty, not used* bucket as well as: THANOS_SKIP_GCS_TESTS=true THANOS_ALLOW_EXISTING_BUCKET_USE=true
 
 And run: `GOCACHE=off go test -v -run TestObjStore_AcceptanceTest_e2e ./pkg/...`
 
@@ -198,7 +194,6 @@ To configure Google Cloud Storage bucket as an object store you need to set `buc
 
 For example:
 
-[embedmd]:# (flags/config_bucket_gcs.txt yaml)
 ```yaml
 type: GCS
 config:
@@ -208,25 +203,18 @@ config:
 
 #### Using GOOGLE_APPLICATION_CREDENTIALS
 
-Application credentials are configured via JSON file and only the bucket needs to be specified,
-the client looks for:
+Application credentials are configured via JSON file and only the bucket needs to be specified, the client looks for:
 
-1. A JSON file whose path is specified by the
-   `GOOGLE_APPLICATION_CREDENTIALS` environment variable.
-2. A JSON file in a location known to the gcloud command-line tool.
-   On Windows, this is `%APPDATA%/gcloud/application_default_credentials.json`.
-   On other systems, `$HOME/.config/gcloud/application_default_credentials.json`.
+1. A JSON file whose path is specified by the `GOOGLE_APPLICATION_CREDENTIALS` environment variable.
+2. A JSON file in a location known to the gcloud command-line tool. On Windows, this is `%APPDATA%/gcloud/application_default_credentials.json`. On other systems, `$HOME/.config/gcloud/application_default_credentials.json`.
 3. On Google App Engine it uses the `appengine.AccessToken` function.
-4. On Google Compute Engine and Google App Engine Managed VMs, it fetches
-   credentials from the metadata server.
-   (In this final case any provided scopes are ignored.)
+4. On Google Compute Engine and Google App Engine Managed VMs, it fetches credentials from the metadata server. (In this final case any provided scopes are ignored.)
 
 You can read more on how to get application credential json file in [https://cloud.google.com/docs/authentication/production](https://cloud.google.com/docs/authentication/production)
 
 #### Using inline a Service Account
 
-Another possibility is to inline the ServiceAccount into the Thanos configuration and only maintain one file.
-This feature was added, so that the Prometheus Operator only needs to take care of one secret file.
+Another possibility is to inline the ServiceAccount into the Thanos configuration and only maintain one file. This feature was added, so that the Prometheus Operator only needs to take care of one secret file.
 
 ```yaml
 type: GCS
@@ -249,7 +237,7 @@ config:
 
 #### GCS Policies
 
-__Note:__ GCS Policies should be applied at the project level, not at the bucket level
+**Note:** GCS Policies should be applied at the project level, not at the bucket level
 
 For deployment:
 
@@ -279,7 +267,6 @@ To configure Azure Storage account as an object store you need to provide a path
 
 Config file format is the following:
 
-[embedmd]:# (flags/config_bucket_azure.txt yaml)
 ```yaml
 type: AZURE
 config:
@@ -298,7 +285,6 @@ Below is an example configuration file for thanos to use OpenStack swift contain
 Note that if the `name` of a user, project or tenant is used one must also specify its domain by ID or name.  
 Various examples for OpenStack authentication can be found in the [official documentation](https://developer.openstack.org/api-ref/identity/v3/index.html?expanded=password-authentication-with-scoped-authorization-detail#password-authentication-with-unscoped-authorization).
 
-[embedmd]:# (flags/config_bucket_swift.txt yaml)
 ```yaml
 type: SWIFT
 config:
@@ -324,7 +310,6 @@ To use Tencent COS as storage store, you should apply a Tencent Account to creat
 
 To configure Tencent Account to use COS as storage store you need to set these parameters in yaml format stored in a file:
 
-[embedmd]:# (flags/config_bucket_cos.txt $)
 ```$
 type: COS
 config:
