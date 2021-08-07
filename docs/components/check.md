@@ -1,6 +1,6 @@
 ---
-title: Check
 type: docs
+title: Check
 menu: components
 ---
 
@@ -9,9 +9,9 @@ menu: components
 The check component contains tools for validation of Prometheus rules.
 
 ## Deployment
+
 ## Flags
 
-[embedmd]:# (flags/check.txt $)
 ```$
 usage: thanos check <command> [<args> ...]
 
@@ -37,13 +37,9 @@ Subcommands:
 
 ```
 
-
 ### Rules
 
-`check rules` checks the Prometheus rules, used by the Thanos rule node, if they are valid.
-The check should be equivalent for the `promtool check rules` but that cannot be used because
-Thanos rule has extended rules file syntax, which includes `partial_response_strategy` field
-which `promtool` does not allow.
+`check rules` checks the Prometheus rules, used by the Thanos rule node, if they are valid. The check should be equivalent for the `promtool check rules` but that cannot be used because Thanos rule has extended rules file syntax, which includes `partial_response_strategy` field which `promtool` does not allow.
 
 If the check fails the command fails with exit code `1`, otherwise `0`.
 
@@ -53,7 +49,6 @@ Example:
 $ ./thanos check rules cmd/thanos/testdata/rules-files/*.yaml
 ```
 
-[embedmd]:# (flags/check_rules.txt)
 ```txt
 usage: thanos check rules <rule-files>...
 
