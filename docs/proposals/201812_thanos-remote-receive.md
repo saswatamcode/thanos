@@ -1,9 +1,9 @@
 ---
-title: Thanos Remote Write
 type: proposal
-menu: proposals
+title: Thanos Remote Write
 status: accepted
 owner: brancz
+menu: proposals
 ---
 
 ## Summary
@@ -31,7 +31,6 @@ The Thanos receiver component seamlessly integrates into the rest of the Thanos 
 Instead of directly scraping metrics, however, the Thanos receiver accepts Prometheus remote-write requests, and writes these into a local instance of the Prometheus tsdb. Once successfully committed to the tenant's tsdbs, the requests returns successfully. To prevent data leaking at the database level, each tenant has an individual tsdb instance, meaning a single Thanos receiver may manage multiple tsdb instances. The receiver answers Thanos store API requests and uploads built blocks of the Prometheus tsdb. Implementation-wise, this just requires wiring up existing components. As tenant's data within object storage are separate objects, it may be enough separation to have a single bucket for all tenants, however, this architecture supports any setup of tenant to object storage bucket combination.
 
 In a minimal setup the system would look like the following:
-
 
 ```
                  +
@@ -94,7 +93,7 @@ Using the tenant's ID in the hash will help to distribute the load across receiv
 hash(string(tenant_id) + sort(timeseries.labelset).join())
 ```
 
-The hashing function used is the same one as used by Prometheus’: [xxHash][xxHash]. Sorting of labels is necessary, in order to ensure that a unique time-series always has the same hash.
+The hashing function used is the same one as used by Prometheus’: [xxHash](http://cyan4973.github.io/xxHash/). Sorting of labels is necessary, in order to ensure that a unique time-series always has the same hash.
 
 While the routing functionality could be a separate component, we choose to have it in the receiver to allow for a simpler setup.
 
@@ -187,7 +186,7 @@ Note that replicating write requests may require additional compaction and dedup
 
 ### Rollout/scaling/failure of receiver nodes
 
-Prometheus remote write will retry whenever the remote write backend is not available, thus intermediate downtime is tolerable and expected for receivers. Prometheus remote write treats 503 as temporary failures and continues do retry until the remote write receiving end responds again. If this ingestion downtime is not acceptable, then a replication factor of 3 or more should be specified, ensuring that a write request is accepted in its entirety by at least 2 replicas. This way we can ensure there is no downtime of ingestion. 
+Prometheus remote write will retry whenever the remote write backend is not available, thus intermediate downtime is tolerable and expected for receivers. Prometheus remote write treats 503 as temporary failures and continues do retry until the remote write receiving end responds again. If this ingestion downtime is not acceptable, then a replication factor of 3 or more should be specified, ensuring that a write request is accepted in its entirety by at least 2 replicas. This way we can ensure there is no downtime of ingestion.
 
 On rollouts receivers do not need to re-shard data, but instead at shutdown in case of rollout or scaling flush the write-ahead-log to a Prometheus tsdb block and upload it to object storage. Rollouts that include a soft tenant being promoted to a hard tenant, does require all nodes of a hash-ring to upload its content as the hash-ring changes. When the nodes comes back and accepts remote write requests again, the tenant local Prometheus server will continue where it left off. When scaling, all nodes need to perform the above operation as the hashring is resized meaning all nodes will have a new distribution. In the case of a failure, and the hashring is not resized, it will load the write-ahead-log and assume where it left off. Partially succeeding requests return a 503 causing Prometheus to retry the full request. This works as identically existing timestamp-value matches are ignored by tsdb. Prometheus relies on this to de-duplicate federation request results, therefore it is safe to rely on this here as well.
 
@@ -205,7 +204,3 @@ Decisions of the design have consequences some of which will show themselves in 
   - While there is work left the pull request seems to be close to completion
 * For compaction to work as described in this proposal, vertical compaction in tsdb needs to be possible. Implemented but not merged yet: https://github.com/prometheus/tsdb/pull/370
 * Additional safeguards may need to be put in place to ensure that hashring resizes do not occur on failed nodes, only once they have recovered and have successfully uploaded their blocks.
-
-[xxhash]: http://cyan4973.github.io/xxHash/
-[prom-label-proxy]: https://github.com/openshift/prom-label-proxy
-

@@ -1,5 +1,7 @@
 PREFIX            ?= $(shell pwd)
 FILES_TO_FMT      ?= $(shell find . -path ./vendor -prune -o -name '*.go' -print)
+MD_FILES_TO_FORMAT = $(shell find docs -name "*.md") $(shell ls *.md)
+MDOX_VALIDATE_CONFIG ?= .mdox.validate.yaml
 
 DOCKER_IMAGE_NAME ?= thanos
 DOCKER_IMAGE_TAG  ?= $(subst /,-,$(shell git rev-parse --abbrev-ref HEAD))-$(shell date +%Y-%m-%d)-$(shell git rev-parse --short HEAD)
@@ -12,6 +14,8 @@ GOPROXY           ?= https://proxy.golang.org
 export GOPROXY
 
 # Tools.
+MDOX              ?= $(GOBIN)/mdox-$(MDOX_VERSION)
+MDOX_VERSION      ?= v0.2.2-0.20210804142644-13fc035da674
 EMBEDMD           ?= $(GOBIN)/embedmd-$(EMBEDMD_VERSION)
 # v2.0.0
 EMBEDMD_VERSION   ?= 97c13d6e41602fc6e397eb51c45f38069371a969
@@ -142,17 +146,17 @@ docker-push:
 	@docker tag "${DOCKER_IMAGE_NAME}" quay.io/thanos/"$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)"
 	@docker push quay.io/thanos/"$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)"
 
-# docs regenerates flags in docs for all thanos commands.
 .PHONY: docs
-docs: $(EMBEDMD) build
-	@EMBEDMD_BIN="$(EMBEDMD)" scripts/genflagdocs.sh
+docs: ## Regenerates flags in docs for all thanos commands localise links, ensure GitHub format.
+docs: $(MDOX) build
+	@echo ">> generating docs"
+	PATH=${PATH}:$(GOBIN) $(MDOX) fmt -l --links.validate.config-file=$(MDOX_VALIDATE_CONFIG) --links.localize.address-regex="https://thanos.io/.*" $(MD_FILES_TO_FORMAT)
 
-# check-docs checks if documentation have discrepancy with flags and if the links are valid.
 .PHONY: check-docs
-check-docs: $(EMBEDMD) $(LICHE) build
-	@EMBEDMD_BIN="$(EMBEDMD)" scripts/genflagdocs.sh check
-	@$(LICHE) --recursive docs --exclude "cloud.tencent.com" --document-root .
-	@$(LICHE) --exclude "cloud.tencent.com|goreportcard.com" --document-root . *.md
+check-docs: ## checks docs against discrepancy with flags, links, white noise.
+check-docs: $(MDOX) build
+	@echo ">> checking local links"
+	PATH=${PATH}:$(GOBIN) $(MDOX) fmt --check -l --links.validate.config-file=$(MDOX_VALIDATE_CONFIG) --links.localize.address-regex="https://thanos.io/.*" $(MD_FILES_TO_FORMAT)
 
 # format formats the code (including imports format).
 .PHONY: format

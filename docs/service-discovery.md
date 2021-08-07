@@ -1,8 +1,8 @@
 ---
-title: Service Discovery
 type: docs
-menu: thanos
+title: Service Discovery
 slug: /service-discovery.md
+menu: thanos
 ---
 
 # Service Discovery
@@ -37,12 +37,9 @@ The repeatable flag `--alertmanager.url=<alertmanager>` can be used to specify a
 
 ## File Service Discovery
 
-File Service Discovery is another mechanism for configuring components. With File SD, a
-list of files can be watched for updates, and the new configuration will be dynamically loaded when a change occurs.
-The list of files to watch is passed to a component via a flag shown in the component specific sections below.
+File Service Discovery is another mechanism for configuring components. With File SD, a list of files can be watched for updates, and the new configuration will be dynamically loaded when a change occurs. The list of files to watch is passed to a component via a flag shown in the component specific sections below.
 
-The format of the configuration file is the same as the one used in [Prometheus' File SD](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#file_sd_config).
-Both YAML and JSON files can be used. The format of the files is this:
+The format of the configuration file is the same as the one used in [Prometheus' File SD](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#file_sd_config). Both YAML and JSON files can be used. The format of the files is this:
 
 * JSON:
 
@@ -60,46 +57,40 @@ Both YAML and JSON files can be used. The format of the files is this:
 - targets: ['localhost:9090', 'example.org:443']
 ```
 
-As a fallback, the file contents are periodically re-read at an interval that can be set using a flag specific for the component and shown below.
-The default value for all File SD re-read intervals is 5 minutes.
+As a fallback, the file contents are periodically re-read at an interval that can be set using a flag specific for the component and shown below. The default value for all File SD re-read intervals is 5 minutes.
 
 ### Thanos Query
 
-The repeatable flag `--store.sd-files=<path>` can be used to specify the path to files that contain addresses of `StoreAPI` servers.
-The `<path>` can be a glob pattern so you can specify several files using a single flag.
+The repeatable flag `--store.sd-files=<path>` can be used to specify the path to files that contain addresses of `StoreAPI` servers. The `<path>` can be a glob pattern so you can specify several files using a single flag.
 
 The flag `--store.sd-interval=<5m>` can be used to change the fallback re-read interval from the default 5 minutes.
 
 ### Thanos Rule
 
-The repeatable flag `--query.sd-files=<path>` can be used to specify the path to files that contain addresses of `QueryAPI` servers.
-Again, the `<path>` can be a glob pattern.
+The repeatable flag `--query.sd-files=<path>` can be used to specify the path to files that contain addresses of `QueryAPI` servers. Again, the `<path>` can be a glob pattern.
 
 The flag `--query.sd-interval=<5m>` can be used to change the fallback re-read interval.
 
 ## DNS Service Discovery
 
-DNS Service Discovery is another mechanism for finding components that can be used in conjunction with Static Flags or File SD.
-With DNS SD, a domain name can be specified and it will be periodically queried to discover a list of IPs.
+DNS Service Discovery is another mechanism for finding components that can be used in conjunction with Static Flags or File SD. With DNS SD, a domain name can be specified and it will be periodically queried to discover a list of IPs.
 
 To use DNS SD, just add one of the following prefixes to the domain name in your configuration:
 
-* `dns+` - the domain name after this prefix will be looked up as an A/AAAA query. *A port is required for this query type*.
-An example using this lookup with a static flag:
+* `dns+` - the domain name after this prefix will be looked up as an A/AAAA query. *A port is required for this query type*. An example using this lookup with a static flag:
+
 ```
 --store=dns+stores.thanos.mycompany.org:9090
 ```
 
-* `dnssrv+` - the domain name after this prefix will be looked up as a SRV query. You do not need to specify a port as the
-one from the query results will be used. An example:
+* `dnssrv+` - the domain name after this prefix will be looked up as a SRV query. You do not need to specify a port as the one from the query results will be used. An example:
+
 ```
 --store=dnssrv+_thanosstores._tcp.mycompany.org
 ```
 
-The default interval between DNS lookups is 30s. You can change it using the `store.sd-dns-interval` flag for `StoreAPI`
-configuration in `Thanos Query`, or `query.sd-dns-interval` for `QueryAPI` configuration in `Thanos Rule`.
+The default interval between DNS lookups is 30s. You can change it using the `store.sd-dns-interval` flag for `StoreAPI` configuration in `Thanos Query`, or `query.sd-dns-interval` for `QueryAPI` configuration in `Thanos Rule`.
 
 ## Other
 
-Currently, there are no plans of adding other Service Discovery mechanisms like Consul SD, kube SD, etc. However, we welcome
-people implementing their preferred Service Discovery by writing the results to File SD which will propagate them to the different Thanos components.
+Currently, there are no plans of adding other Service Discovery mechanisms like Consul SD, kube SD, etc. However, we welcome people implementing their preferred Service Discovery by writing the results to File SD which will propagate them to the different Thanos components.
