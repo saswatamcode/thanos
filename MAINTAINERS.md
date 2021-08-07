@@ -1,46 +1,42 @@
 # Core Maintainers of this repository
 
-| Name                  | Email                  | Slack                    | GitHub                                      | Company           |
-|-----------------------|------------------------|--------------------------|---------------------------------------------|-------------------|
-| Bartłomiej Płotka     | bwplotka@gmail.com     | `@bwplotka`              | [@bwplotka](https://github.com/bwplotka)    | Red Hat           |
-| Dominic Green         | dom@improbable.io      | `@domgreen`              | [@domgreen](https://github.com/domgreen)    | Improbable        |
-| Frederic Branczyk     | fbranczyk@gmail.com    | `@brancz`                | [@brancz](https://github.com/brancz)        | Red Hat           |
-| Giedrius Statkevičius | giedriuswork@gmail.com | `@Giedrius Statkevičius` | [@GiedriusS](https://github.com/GiedriusS)  | AdForm            |
-| Povilas Versockas     | p.versockas@gmail.com  | `@povilasv`              | [@povilasv](https://github.com/povilasv)    | Utility Warehouse |
-| Matthias Loibl        | mail@matthiasloibl.com | `@metalmatze`            | [@metalmatze](https://github.com/metalmatze)| Red Hat           |
-| Lucas Servén Marín    | lserven@gmail.com      |  `@squat`                  | [@squat](https://github.com/squat)          | Red Hat           |
+| Name                  | Email                  | Slack                    | GitHub                                       | Company           |
+|-----------------------|------------------------|--------------------------|----------------------------------------------|-------------------|
+| Bartłomiej Płotka     | bwplotka@gmail.com     | `@bwplotka`              | [@bwplotka](https://github.com/bwplotka)     | Red Hat           |
+| Dominic Green         | dom@improbable.io      | `@domgreen`              | [@domgreen](https://github.com/domgreen)     | Improbable        |
+| Frederic Branczyk     | fbranczyk@gmail.com    | `@brancz`                | [@brancz](https://github.com/brancz)         | Red Hat           |
+| Giedrius Statkevičius | giedriuswork@gmail.com | `@Giedrius Statkevičius` | [@GiedriusS](https://github.com/GiedriusS)   | AdForm            |
+| Povilas Versockas     | p.versockas@gmail.com  | `@povilasv`              | [@povilasv](https://github.com/povilasv)     | Utility Warehouse |
+| Matthias Loibl        | mail@matthiasloibl.com | `@metalmatze`            | [@metalmatze](https://github.com/metalmatze) | Red Hat           |
+| Lucas Servén Marín    | lserven@gmail.com      | `@squat`                 | [@squat](https://github.com/squat)           | Red Hat           |
 
-We are bunch of people from different companies with various interests and skills.
-We are from different parts of Europe: Germany, Lithuania, Poland and UK. 
-We have something in common though: We all share the love for OpenSource, Go, Prometheus, :coffee: and Observability topics.
+We are bunch of people from different companies with various interests and skills. We are from different parts of Europe: Germany, Lithuania, Poland and UK. We have something in common though: We all share the love for OpenSource, Go, Prometheus, :coffee: and Observability topics.
 
 As either Software Developers or SRE (or both!) we've chosen to maintain (mostly in our free time) Thanos, the de facto way to scale awesome [Prometheus](https://prometheus.io) project.
 
 Feel free to contact us (preferably on Slack) anytime for feedback, questions or :beers:/:coffee:/:tea:.
 
-Especially feedback, please share if you have ideas what we can do better! 
+Especially feedback, please share if you have ideas what we can do better!
 
 ## Triage
 
-We also have some nice souls that help triaging issues and PRs. See [here](https://help.github.com/en/articles/repository-permission-levels-for-an-organization#permission-levels-for-repositories-owned-by-an-organization) 
-for details about the role's permission. 
+We also have some nice souls that help triaging issues and PRs. See [here](https://help.github.com/en/articles/repository-permission-levels-for-an-organization#permission-levels-for-repositories-owned-by-an-organization) for details about the role's permission.
 
 Full list of triage persons is displayed below:
 
-| Name                  | Slack                    | GitHub                                                     |
-|-----------------------|--------------------------|------------------------------------------------------------|
-| Adrien Fillon         | `@Adrien F`              | [@adrien-f](https://github.com/adrien-f)                   |
-| Martin Chodur         | `@FUSAKLA`               | [@fusakla](https://github.com/fusakla)                     |
-| Michael Dai           | `@jojohappy`             | [@jojohappy](https://github.com/jojohappy)                 |
+| Name          | Slack        | GitHub                                     |
+|---------------|--------------|--------------------------------------------|
+| Adrien Fillon | `@Adrien F`  | [@adrien-f](https://github.com/adrien-f)   |
+| Martin Chodur | `@FUSAKLA`   | [@fusakla](https://github.com/fusakla)     |
+| Michael Dai   | `@jojohappy` | [@jojohappy](https://github.com/jojohappy) |
 
 Please reach any of the maintainer on slack or email if you want to help as well.
 
 ### Triage labels
 
-To improve navigating through issues and PRs we introduce various [labels](https://github.com/thanos-io/thanos/issues/labels). Part of triaging process for Triage and Maintainers
-is to adjust those labels if needed manual. The `Prow` system can automate a portion of this in future.
+To improve navigating through issues and PRs we introduce various [labels](https://github.com/thanos-io/thanos/issues/labels). Part of triaging process for Triage and Maintainers is to adjust those labels if needed manual. The `Prow` system can automate a portion of this in future.
 
-The main labels are: 
+The main labels are:
 
 #### Component
 
@@ -70,8 +66,7 @@ This helps to also estimate how long it can potentially take to review the PR or
 
 #### State
 
-Github shows some basic states, but sometimes PR is stale due to requested changes, but it's not clear from first glance.
-That's why `state: changes-requested` is helpful on those.
+Github shows some basic states, but sometimes PR is stale due to requested changes, but it's not clear from first glance. That's why `state: changes-requested` is helpful on those.
 
 #### Other
 
@@ -85,18 +80,16 @@ Self explanatory ones:
 
 ## Storage plugins maintainers
 
-Maintainers of bucket storage clients are available [here](/docs/storage.md#implementations)
+Maintainers of bucket storage clients are available [here](docs/storage.md#configuration)
 
 ## How to be maintainer?
 
-Any [contributor](/CONTRIBUTING.md) that shows effort and willingness in maintaining Thanos repository can join maintainer team.
+Any [contributor](CONTRIBUTING.md) that shows effort and willingness in maintaining Thanos repository can join maintainer team.
 
 Open Source is all about the trust, which is the key factor in decision to add write permissions.
 
-In time we plan to set up maintainers team that will be organization independent. Reach us if you have any questions or want to join
-maintainer team.
+In time we plan to set up maintainers team that will be organization independent. Reach us if you have any questions or want to join maintainer team.
 
 ## Initial authors
 
 Fabian Reinartz @fabxc and Bartłomiej Płotka @bwplotka
-
