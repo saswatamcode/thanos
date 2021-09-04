@@ -1,7 +1,7 @@
 version: 1
 
-inputDir: "docs"
-outputDir: "website/docs-pre-processed/tip"
+inputDir: "$(INPUT_DIR)"
+outputDir: "$(OUTPUT_DIR)"
 extraInputGlobs:
   - "CHANGELOG.md"
   - "SECURITY.md"

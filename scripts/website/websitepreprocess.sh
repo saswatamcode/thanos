@@ -6,7 +6,7 @@ RELEASE_FILTER_RE="release-(0|[1-9]\d*)\.(0|[1-9]\d*)$"
 WEBSITE_DIR="website"
 ORIGINAL_CONTENT_DIR="docs"
 FILES="${WEBSITE_DIR}/docs-pre-processed/*"
-MDOX_TIP_CONFIG=".mdox.yaml"
+MDOX_CONFIG=".mdox.yaml"
 MDOX_PREV_CONFIG=".mdox.prev-release.yaml"
 
 # Support gtar and ggrep on OSX (installed via brew), falling back to tar and grep. On Linux
@@ -22,19 +22,24 @@ git remote add origin https://github.com/thanos-io/thanos.git
 git remote -v
 git fetch origin
 
-RELEASE_BRANCHES=$(git branch --all | $GREP -P "remotes/origin/${RELEASE_FILTER_RE}" | egrep --invert-match '(:?HEAD|main)$' | sort -V)
-echo ">> chosen $(echo ${RELEASE_BRANCHES}) releases to deploy docs from"
+RELEASE_BRANCHES_WITH_FM=$(git branch --all | $GREP -P "remotes/origin/${RELEASE_FILTER_RE}" | egrep --invert-match '(:?HEAD|main)$' | sort -V)
+echo ">> chosen $(echo ${RELEASE_BRANCHES}) releases to deploy docs from" | head -n 22
+
+RELEASE_BRANCHES_WITHOUT_FM=$(git branch --all | $GREP -P "remotes/origin/${RELEASE_FILTER_RE}" | egrep --invert-match '(:?HEAD|main)$' | sort -V)
+echo ">> chosen $(echo ${RELEASE_BRANCHES}) releases to deploy docs from" | tail -n +22
 
 # preprocess tip separately
 rm -rf ${OUTPUT_CONTENT_DIR}
 PATH=$PATH:$GOBIN
-$MDOX transform --log.level=debug --config-file=$MDOX_TIP_CONFIG
+export INPUT_DIR="docs"
+export OUTPUT_DIR="${OUTPUT_CONTENT_DIR}/tip"
+$MDOX transform --log.level=debug --config-file=$MDOX_CONFIG
 scripts/website/mdoxpostprocess.sh "${OUTPUT_CONTENT_DIR}/tip" 100000
 
 #create variable for weight value
 WEIGHT_VALUE=0
 
-for branchRef in ${RELEASE_BRANCHES}; do
+for branchRef in ${RELEASE_BRANCHES_WITH_FM}; do
   WEIGHT_VALUE=$((WEIGHT_VALUE + 1))
   branchName=${branchRef##*/}
   # Exported for use in .mdox.prev-release.yaml
@@ -43,6 +48,20 @@ for branchRef in ${RELEASE_BRANCHES}; do
   mkdir -p "${OUTPUT_CONTENT_DIR}/${tags}-git-docs"
   git archive --format=tar "refs/${branchRef}" | $TAR -C${OUTPUT_CONTENT_DIR}/${tags}-git-docs -x "docs/" --strip-components=1
   $MDOX transform --log.level=debug --config-file=$MDOX_PREV_CONFIG
+  scripts/website/mdoxpostprocess.sh "${OUTPUT_CONTENT_DIR}/${tags}" ${WEIGHT_VALUE}
+  rm -rf ${OUTPUT_CONTENT_DIR}/${tags}-git-docs
+done
+
+for branchRef in ${RELEASE_BRANCHES_WITHOUT_FM}; do
+  WEIGHT_VALUE=$((WEIGHT_VALUE + 1))
+  branchName=${branchRef##*/}
+  echo ">> cloning docs for versioning ${tags}"
+  mkdir -p "${OUTPUT_CONTENT_DIR}/${tags}-git-docs"
+  git archive --format=tar "refs/${branchRef}" | $TAR -C${OUTPUT_CONTENT_DIR}/${tags}-git-docs -x "docs/" --strip-components=1
+  # Exported for use in .mdox.yaml
+  export INPUT_DIR="${OUTPUT_CONTENT_DIR}/${tags}-git-docs"
+  export OUTPUT_DIR="${OUTPUT_CONTENT_DIR}/${tags}"
+  $MDOX transform --log.level=debug --config-file=$MDOX_CONFIG
   scripts/website/mdoxpostprocess.sh "${OUTPUT_CONTENT_DIR}/${tags}" ${WEIGHT_VALUE}
   rm -rf ${OUTPUT_CONTENT_DIR}/${tags}-git-docs
 done
