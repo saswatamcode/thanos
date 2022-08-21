@@ -22,9 +22,7 @@ import (
 	e2edb "github.com/efficientgo/e2e/db"
 	"github.com/efficientgo/tools/core/pkg/backoff"
 	"github.com/pkg/errors"
-	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/config"
-	"github.com/prometheus/prometheus/discovery/targetgroup"
 	"github.com/prometheus/prometheus/model/relabel"
 	"github.com/thanos-io/objstore/exthttp"
 	"github.com/thanos-io/objstore/providers/s3"
@@ -212,6 +210,7 @@ type QuerierBuilder struct {
 	routePrefix    string
 	externalPrefix string
 	image          string
+	fileSDPath     string
 
 	storeAddresses       []string
 	fileSDStoreAddresses []string
@@ -262,8 +261,8 @@ func (q *QuerierBuilder) WithStoreAddresses(storeAddresses ...string) *QuerierBu
 	return q
 }
 
-func (q *QuerierBuilder) WithFileSDStoreAddresses(fileSDStoreAddresses ...string) *QuerierBuilder {
-	q.fileSDStoreAddresses = fileSDStoreAddresses
+func (q *QuerierBuilder) WithFileSDStoreAddresses(fileSDPath string) *QuerierBuilder {
+	q.fileSDPath = fileSDPath
 	return q
 }
 
@@ -369,26 +368,15 @@ func (q *QuerierBuilder) collectArgs() ([]string, error) {
 	for _, addr := range q.endpoints {
 		args = append(args, "--endpoint="+addr)
 	}
-	if len(q.fileSDStoreAddresses) > 0 {
-		if err := os.MkdirAll(q.Dir(), 0750); err != nil {
-			return nil, errors.Wrap(err, "create query dir failed")
-		}
-
-		fileSD := []*targetgroup.Group{{}}
-		for _, a := range q.fileSDStoreAddresses {
-			fileSD[0].Targets = append(fileSD[0].Targets, model.LabelSet{model.AddressLabel: model.LabelValue(a)})
-		}
-
-		b, err := yaml.Marshal(fileSD)
+	if q.fileSDPath != "" {
+		args = append(args, "--store.sd-files="+q.fileSDPath)
+	}
+	if (len(q.storeAddresses) == 0 && q.fileSDPath == "") && len(q.endpointConfig) > 0 {
+		endpointCfgBytes, err := yaml.Marshal(q.endpointConfig)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrapf(err, "generate endpoint config file: %v", q.endpointConfig)
 		}
-
-		if err := os.WriteFile(q.Dir()+"/filesd.yaml", b, 0600); err != nil {
-			return nil, errors.Wrap(err, "creating query SD config failed")
-		}
-
-		args = append(args, "--store.sd-files="+filepath.Join(q.InternalDir(), "filesd.yaml"))
+		args = append(args, "--endpoint.config="+string(endpointCfgBytes))
 	}
 	if q.routePrefix != "" {
 		args = append(args, "--web.route-prefix="+q.routePrefix)

@@ -125,9 +125,12 @@ func TestQuery(t *testing.T) {
 	prom4, sidecar4 := e2ethanos.NewPrometheusWithSidecar(e, "ha2", e2ethanos.DefaultPromConfig("prom-ha", 1, "", "", e2ethanos.LocalPrometheusTarget), "", e2ethanos.DefaultPrometheusImage(), "")
 	testutil.Ok(t, e2e.StartAndWaitReady(prom1, sidecar1, prom2, sidecar2, prom3, sidecar3, prom4, sidecar4))
 
+	fileSDPath, err := createSDFile(e.SharedDir(), "1", []string{sidecar3.InternalEndpoint("grpc"), sidecar4.InternalEndpoint("grpc")})
+	testutil.Ok(t, err)
+
 	// Querier. Both fileSD and directly by flags.
 	q := e2ethanos.NewQuerierBuilder(e, "1", sidecar1.InternalEndpoint("grpc"), sidecar2.InternalEndpoint("grpc"), receiver.InternalEndpoint("grpc")).
-		WithFileSDStoreAddresses(sidecar3.InternalEndpoint("grpc"), sidecar4.InternalEndpoint("grpc")).Init()
+		WithFileSDStoreAddresses(fileSDPath).Init()
 	testutil.Ok(t, e2e.StartAndWaitReady(q))
 
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
@@ -227,7 +230,7 @@ func createSDFile(sharedDir string, name string, fileSDStoreAddresses []string) 
 func TestQueryWithEndpointConfig(t *testing.T) {
 	t.Parallel()
 
-	e, err := e2e.NewDockerEnvironment("e2e_endpointconfig")
+	e, err := e2e.NewDockerEnvironment("e2e_config")
 	testutil.Ok(t, err)
 	t.Cleanup(e2ethanos.CleanScenario(t, e))
 
