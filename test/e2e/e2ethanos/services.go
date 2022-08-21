@@ -35,6 +35,7 @@ import (
 	"github.com/thanos-io/thanos/pkg/alert"
 	"github.com/thanos-io/thanos/pkg/httpconfig"
 
+	"github.com/thanos-io/thanos/pkg/query"
 	"github.com/thanos-io/thanos/pkg/queryfrontend"
 	"github.com/thanos-io/thanos/pkg/receive"
 )
@@ -220,6 +221,7 @@ type QuerierBuilder struct {
 	exemplarAddresses    []string
 	enableFeatures       []string
 	endpoints            []string
+	endpointConfig       []query.EndpointConfig
 
 	replicaLabels []string
 	tracingConfig string
@@ -308,6 +310,11 @@ func (q *QuerierBuilder) WithTracingConfig(tracingConfig string) *QuerierBuilder
 // WithReplicaLabels replaces default [replica] replica label configuration for the querier.
 func (q *QuerierBuilder) WithReplicaLabels(labels ...string) *QuerierBuilder {
 	q.replicaLabels = labels
+	return q
+}
+
+func (q *QuerierBuilder) WithEndpointConfig(endpointConfig []query.EndpointConfig) *QuerierBuilder {
+	q.endpointConfig = endpointConfig
 	return q
 }
 

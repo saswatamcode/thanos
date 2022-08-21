@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	extflag "github.com/efficientgo/tools/extkingpin"
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 	grpc_logging "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
@@ -135,6 +136,8 @@ func registerQuery(app *extkingpin.App) {
 	fileSDFiles := cmd.Flag("store.sd-files", "Path to files that contain addresses of store API servers. The path can be a glob pattern (repeatable).").
 		PlaceHolder("<path>").Strings()
 
+	endpointConfig := extflag.RegisterPathOrContent(cmd, "endpoint.config", "YAML file that contains set of endpoints (e.g Store API) with optional TLS options. To enable TLS either use this option or deprecated ones --grpc-client-tls* .", extflag.WithEnvSubstitution())
+
 	fileSDInterval := extkingpin.ModelDuration(cmd.Flag("store.sd-interval", "Refresh interval to re-read file SD files. It is used as a resync fallback.").
 		Default("5m"))
 
@@ -219,6 +222,23 @@ func registerQuery(app *extkingpin.App) {
 			fileSD = file.NewDiscovery(conf, logger)
 		}
 
+		endpointConfigYAML, err := endpointConfig.Content()
+		if err != nil {
+			return err
+		}
+
+		if *secure && len(endpointConfigYAML) != 0 {
+			return errors.Errorf("deprecated flags --grpc-client-tls* and new --endpoint.config flag cannot be specified at the same time; use either of those")
+		}
+
+		var fileSDConfig *file.SDConfig
+		if len(*fileSDFiles) > 0 {
+			fileSDConfig = &file.SDConfig{
+				Files:           *fileSDFiles,
+				RefreshInterval: *fileSDInterval,
+			}
+		}
+
 		if *webRoutePrefix == "" {
 			*webRoutePrefix = *webExternalPrefix
 		}
@@ -276,6 +296,8 @@ func registerQuery(app *extkingpin.App) {
 			*enableTargetPartialResponse,
 			*enableMetricMetadataPartialResponse,
 			*enableExemplarPartialResponse,
+			fileSDConfig,
+			endpointConfigYAML,
 			*activeQueryDir,
 			fileSD,
 			time.Duration(*dnsSDInterval),
@@ -345,6 +367,8 @@ func runQuery(
 	enableTargetPartialResponse bool,
 	enableMetricMetadataPartialResponse bool,
 	enableExemplarPartialResponse bool,
+	fileSDConfig *file.SDConfig,
+	endpointConfigYAML []byte,
 	activeQueryDir string,
 	fileSD *file.Discovery,
 	dnsSDInterval time.Duration,
@@ -397,6 +421,18 @@ func runQuery(
 		}
 	}
 
+	combinedAddresses := storeAddrs
+	combinedAddresses = append(combinedAddresses, ruleAddrs...)
+	combinedAddresses = append(combinedAddresses, metadataAddrs...)
+	combinedAddresses = append(combinedAddresses, exemplarAddrs...)
+	combinedAddresses = append(combinedAddresses, targetAddrs...)
+
+	// Create endpoint config combining flag-based options with --endpoint.config.
+	endpointConfig, err := query.LoadConfig(endpointConfigYAML, combinedAddresses, fileSDConfig)
+	if err != nil {
+		return errors.Wrap(err, "loading endpoint config")
+	}
+
 	dnsEndpointProvider := dns.NewProvider(
 		logger,
 		extprom.WrapRegistererWithPrefix("thanos_query_endpoints_", reg),
@@ -440,6 +476,12 @@ func runQuery(
 
 				for _, addr := range strictEndpoints {
 					specs = append(specs, query.NewGRPCEndpointSpec(addr, true))
+				}
+
+				for _, config := range endpointConfig {
+					for _, addr := range config.Endpoints {
+						specs = append(specs, query.NewGRPCEndpointSpec(addr, true))
+					}
 				}
 
 				for _, dnsProvider := range []*dns.Provider{
