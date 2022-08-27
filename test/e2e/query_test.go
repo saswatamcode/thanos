@@ -23,7 +23,8 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/golang/snappy"
 	config_util "github.com/prometheus/common/config"
-	"github.com/prometheus/prometheus/discovery/file"
+
+	//"github.com/prometheus/prometheus/discovery/file"
 	"github.com/prometheus/prometheus/discovery/targetgroup"
 	"github.com/prometheus/prometheus/prompb"
 	"github.com/prometheus/prometheus/storage/remote"
@@ -243,9 +244,9 @@ func TestQueryWithEndpointConfig(t *testing.T) {
 	prom4, sidecar4 := e2ethanos.NewPrometheusWithSidecar(e, "ha2", e2ethanos.DefaultPromConfig("prom-ha", 1, "", "", e2ethanos.LocalPrometheusTarget), "", e2ethanos.DefaultPrometheusImage(), "")
 	testutil.Ok(t, e2e.StartAndWaitReady(prom1, sidecar1, prom2, sidecar2, prom3, sidecar3, prom4, sidecar4))
 
-	// Querier. Both fileSD and directly by flags.
-	fileSDPath, err := createSDFile(e.SharedDir(), "1", []string{sidecar3.InternalEndpoint("grpc"), sidecar4.InternalEndpoint("grpc")})
-	testutil.Ok(t, err)
+	// // Querier. Both fileSD and directly by flags.
+	// fileSDPath, err := createSDFile(e.SharedDir(), "1", []string{sidecar3.InternalEndpoint("grpc"), sidecar4.InternalEndpoint("grpc")})
+	// testutil.Ok(t, err)
 
 	endpointConfig := []query.EndpointConfig{
 		{
@@ -253,12 +254,15 @@ func TestQueryWithEndpointConfig(t *testing.T) {
 		},
 		{
 			Endpoints: []string{receiver.InternalEndpoint("grpc")},
-			EndpointsSD: []file.SDConfig{
-				{
-					Files:           []string{fileSDPath},
-					RefreshInterval: model.Duration(time.Minute),
-				},
-			},
+			// EndpointsSD: []file.SDConfig{
+			// 	{
+			// 		Files:           []string{fileSDPath},
+			// 		RefreshInterval: model.Duration(time.Minute),
+			// 	},
+			// },
+		},
+		{
+			Endpoints: []string{sidecar3.InternalEndpoint("grpc"), sidecar4.InternalEndpoint("grpc")},
 		},
 	}
 	q := e2ethanos.NewQuerierBuilder(e, "1").WithEndpointConfig(endpointConfig).Init()

@@ -482,6 +482,7 @@ func runQuery(
 					for _, addr := range config.Endpoints {
 						specs = append(specs, query.NewGRPCEndpointSpec(addr, true))
 					}
+
 				}
 
 				for _, dnsProvider := range []*dns.Provider{

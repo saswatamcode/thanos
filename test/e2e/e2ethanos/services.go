@@ -371,13 +371,14 @@ func (q *QuerierBuilder) collectArgs() ([]string, error) {
 	if q.fileSDPath != "" {
 		args = append(args, "--store.sd-files="+q.fileSDPath)
 	}
-	if (len(q.storeAddresses) == 0 && q.fileSDPath == "") && len(q.endpointConfig) > 0 {
+	if len(q.endpointConfig) > 0 {
 		endpointCfgBytes, err := yaml.Marshal(q.endpointConfig)
 		if err != nil {
 			return nil, errors.Wrapf(err, "generate endpoint config file: %v", q.endpointConfig)
 		}
 		args = append(args, "--endpoint.config="+string(endpointCfgBytes))
 	}
+
 	if q.routePrefix != "" {
 		args = append(args, "--web.route-prefix="+q.routePrefix)
 	}
