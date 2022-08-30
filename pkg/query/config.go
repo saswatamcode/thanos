@@ -2,7 +2,6 @@ package query
 
 import (
 	"github.com/pkg/errors"
-	"github.com/prometheus/prometheus/discovery/file"
 	"github.com/thanos-io/thanos/pkg/httpconfig"
 	"gopkg.in/yaml.v2"
 )
@@ -13,7 +12,7 @@ type EndpointConfig struct {
 }
 
 // LoadConfig returns list of per-endpoint TLS config.
-func LoadConfig(confYAML []byte, endpointAddrs []string, globalFileSDConfig *file.SDConfig) ([]EndpointConfig, error) {
+func LoadConfig(confYAML []byte, endpointAddrs []string, globalFileSDConfig httpconfig.FileSDConfig) ([]EndpointConfig, error) {
 	var endpointConfig []EndpointConfig
 
 	if len(confYAML) > 0 {
@@ -25,10 +24,10 @@ func LoadConfig(confYAML []byte, endpointAddrs []string, globalFileSDConfig *fil
 
 	// Adding --store, rule, metadata, target, exemplar and --store.sd-files, if provided.
 	// Global TLS config applies until deprecated.
-	if len(endpointAddrs) > 0 || globalFileSDConfig != nil {
+	if len(endpointAddrs) > 0 || globalFileSDConfig.Files != nil {
 		cfg := EndpointConfig{}
 		cfg.Endpoints = endpointAddrs
-		if globalFileSDConfig != nil {
+		if globalFileSDConfig.Files != nil {
 			cfg.EndpointsSD = []httpconfig.FileSDConfig{
 				{
 					Files:           globalFileSDConfig.Files,

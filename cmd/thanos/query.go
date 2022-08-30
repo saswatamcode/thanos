@@ -40,6 +40,7 @@ import (
 	"github.com/thanos-io/thanos/pkg/extprom"
 	extpromhttp "github.com/thanos-io/thanos/pkg/extprom/http"
 	"github.com/thanos-io/thanos/pkg/gate"
+	"github.com/thanos-io/thanos/pkg/httpconfig"
 	"github.com/thanos-io/thanos/pkg/info"
 	"github.com/thanos-io/thanos/pkg/info/infopb"
 	"github.com/thanos-io/thanos/pkg/logging"
@@ -231,15 +232,15 @@ func registerQuery(app *extkingpin.App) {
 			return errors.Errorf("deprecated flags --grpc-client-tls* and new --endpoint.config flag cannot be specified at the same time; use either of those")
 		}
 
-		var fileSDConfig *file.SDConfig
-		if len(*fileSDFiles) > 0 {
-			fileSDConfig = &file.SDConfig{
-				Files:           *fileSDFiles,
-				RefreshInterval: *fileSDInterval,
-			}
-			//fileSDConfig = file.NewDiscovery(fileSDConfig, logger)
+		var fileSDConfig httpconfig.FileSDConfig
+		// if len(*fileSDFiles) > 0 {
+		// 	fileSDConfig = &file.SDConfig{
+		// 		Files:           *fileSDFiles,
+		// 		RefreshInterval: *fileSDInterval,
+		// 	}
+		// 	//fileSDConfig = file.NewDiscovery(fileSDConfig, logger)
 
-		}
+		// }
 
 		if *webRoutePrefix == "" {
 			*webRoutePrefix = *webExternalPrefix
@@ -369,7 +370,7 @@ func runQuery(
 	enableTargetPartialResponse bool,
 	enableMetricMetadataPartialResponse bool,
 	enableExemplarPartialResponse bool,
-	fileSDConfig *file.SDConfig,
+	fileSDConfig httpconfig.FileSDConfig,
 	endpointConfigYAML []byte,
 	activeQueryDir string,
 	fileSD *file.Discovery,
