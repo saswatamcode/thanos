@@ -24,6 +24,7 @@ import (
 	"github.com/golang/snappy"
 	config_util "github.com/prometheus/common/config"
 
+	"github.com/prometheus/prometheus/discovery/file"
 	"github.com/prometheus/prometheus/discovery/targetgroup"
 	"github.com/prometheus/prometheus/prompb"
 	"github.com/prometheus/prometheus/storage/remote"
@@ -33,7 +34,6 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/thanos-io/thanos/pkg/api/query/querypb"
-	"github.com/thanos-io/thanos/pkg/httpconfig"
 	prompb_copy "github.com/thanos-io/thanos/pkg/store/storepb/prompb"
 
 	"github.com/chromedp/cdproto/network"
@@ -254,17 +254,13 @@ func TestQueryWithEndpointConfig(t *testing.T) {
 		},
 		{
 			Endpoints: []string{receiver.InternalEndpoint("grpc")},
-			EndpointsSD: []httpconfig.FileSDConfig{
-				{
-					Files:           []string{fileSDPath},
-					RefreshInterval: model.Duration(time.Minute),
-				},
+			EndpointsSD: &file.SDConfig{
+				Files:           []string{fileSDPath},
+				RefreshInterval: model.Duration(time.Minute),
 			},
 		},
-		{
-			Endpoints: []string{sidecar3.InternalEndpoint("grpc"), sidecar4.InternalEndpoint("grpc")},
-		},
 	}
+
 	q := e2ethanos.NewQuerierBuilder(e, "1").WithEndpointConfig(endpointConfig).Init()
 	testutil.Ok(t, e2e.StartAndWaitReady(q))
 
