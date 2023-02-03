@@ -11,7 +11,7 @@ on:
 # TODO(bwplotka): Add tests here.
 jobs:
   cross-build-check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     name: Go build for different platforms
     env:
       GOBIN: /tmp/.bin
