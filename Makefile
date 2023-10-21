@@ -150,7 +150,9 @@ react-app-start: $(REACT_APP_NODE_MODULES_PATH)
 .PHONY: build
 build: ## Builds Thanos binary using `promu`.
 build: check-git deps $(PROMU)
-	@echo ">> building Thanos binary in $(PREFIX)"
+	@echo ">> building Thanos binary in $(PREFIX) with $(PROMU)"
+	@echo ">> GOBIN in $(GOBIN)"
+	@echo ">> GOPATH in $(GOPATH)"
 	@$(PROMU) build --prefix $(PREFIX)
 
 GIT_BRANCH=$(shell $(GIT) rev-parse --abbrev-ref HEAD)
