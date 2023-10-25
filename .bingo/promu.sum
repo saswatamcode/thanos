@@ -371,6 +371,8 @@ github.com/prometheus/promu v0.5.0 h1:q7GkmIdBZ+ulL+6v4EDsZL+cW9UCW9J3DHA89bFI83
 github.com/prometheus/promu v0.5.0/go.mod h1:sXydR89lpo0YkCrYK1EhYjaJUesenzLhd9CNRAwN+bI=
 github.com/prometheus/promu v0.6.0 h1:dPx3Pf4uOrxQ2HwwXP9rnhPOGLKMo9QNAZx07KUgtok=
 github.com/prometheus/promu v0.6.0/go.mod h1:ckmZH3zz0h2ZwEH0bV/KWg9uv9/DWsEl96D2IkDRAZQ=
+github.com/prometheus/promu v0.7.0 h1:pjz1pZ07BX6MN9m9DCWV0dbnLgTHoxOdlW8ql9z9qE4=
+github.com/prometheus/promu v0.7.0/go.mod h1:ckmZH3zz0h2ZwEH0bV/KWg9uv9/DWsEl96D2IkDRAZQ=
 github.com/prometheus/promu v0.15.0 h1:HeihVxaiNBL7MCL14v4QFjYGFPAC/oa1/AB2gqRbcXQ=
 github.com/prometheus/promu v0.15.0/go.mod h1:7JtFYJXheeXhw6LNsaI9ZSSxUZU4UpkKuVmzc+zSB6c=
 github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
