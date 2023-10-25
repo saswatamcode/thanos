@@ -166,7 +166,7 @@ crossbuild: | $(PROMU)
 else
 crossbuild: | $(PROMU)
 	@echo ">> crossbuilding all binaries"
-	$(PROMU) crossbuild -v -p linux/amd64 -p linux/arm64 -p linux/ppc64le -p darwin/amd64 -p darwin/arm64
+	$(PROMU) crossbuild -v -p linux/amd64 -p linux/arm64 -p linux/ppc64le -p darwin/amd64
 endif
 
 
