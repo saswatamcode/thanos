@@ -184,7 +184,7 @@ func (s *TSDBStore) Series(r *storepb.SeriesRequest, seriesSrv storepb.Store_Ser
 		return status.Error(codes.InvalidArgument, errors.New("no matchers specified (excluding external labels)").Error())
 	}
 
-	q, err := s.db.ChunkQuerier(context.Background(), r.MinTime, r.MaxTime)
+	q, err := s.db.ChunkQuerier(r.MinTime, r.MaxTime)
 	if err != nil {
 		return status.Error(codes.Internal, err.Error())
 	}
@@ -195,7 +195,7 @@ func (s *TSDBStore) Series(r *storepb.SeriesRequest, seriesSrv storepb.Store_Ser
 		defer runutil.CloseWithLogOnErr(s.logger, q, "close tsdb chunk querier series")
 	}
 
-	set := q.Select(true, nil, matchers...)
+	set := q.Select(srv.Context(), true, nil, matchers...)
 
 	shardMatcher := r.ShardInfo.Matcher(&s.buffers)
 	defer shardMatcher.Close()
@@ -297,13 +297,13 @@ func (s *TSDBStore) LabelNames(ctx context.Context, r *storepb.LabelNamesRequest
 		return &storepb.LabelNamesResponse{Names: nil}, nil
 	}
 
-	q, err := s.db.ChunkQuerier(ctx, r.Start, r.End)
+	q, err := s.db.ChunkQuerier(r.Start, r.End)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	defer runutil.CloseWithLogOnErr(s.logger, q, "close tsdb querier label names")
 
-	res, _, err := q.LabelNames(matchers...)
+	res, _, err := q.LabelNames(ctx, matchers...)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -339,22 +339,36 @@ func (s *TSDBStore) LabelValues(ctx context.Context, r *storepb.LabelValuesReque
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
-
 	if !match {
-		return &storepb.LabelValuesResponse{Values: nil}, nil
+		return &storepb.LabelValuesResponse{}, nil
 	}
 
-	if v := s.getExtLset().Get(r.Label); v != "" {
-		return &storepb.LabelValuesResponse{Values: []string{v}}, nil
-	}
-
-	q, err := s.db.ChunkQuerier(ctx, r.Start, r.End)
+	q, err := s.db.ChunkQuerier(r.Start, r.End)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	defer runutil.CloseWithLogOnErr(s.logger, q, "close tsdb querier label values")
 
-	res, _, err := q.LabelValues(r.Label, matchers...)
+	// If we request label values for an external label while selecting an additional matcher for other label values
+	if val := s.getExtLset().Get(r.Label); val != "" {
+		if len(matchers) == 0 {
+			return &storepb.LabelValuesResponse{Values: []string{val}}, nil
+		}
+
+		hints := &storage.SelectHints{
+			Start: r.Start,
+			End:   r.End,
+			Func:  "series",
+		}
+		set := q.Select(ctx, false, hints, matchers...)
+
+		for set.Next() {
+			return &storepb.LabelValuesResponse{Values: []string{val}}, nil
+		}
+		return &storepb.LabelValuesResponse{}, nil
+	}
+
+	res, _, err := q.LabelValues(ctx, r.Label, matchers...)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

@@ -14,6 +14,7 @@ import (
 	"github.com/prometheus/prometheus/tsdb/chunkenc"
 	"github.com/prometheus/prometheus/tsdb/chunks"
 	"github.com/prometheus/prometheus/tsdb/index"
+	"github.com/prometheus/prometheus/util/annotations"
 
 	"github.com/thanos-io/thanos/pkg/block"
 )
@@ -74,7 +75,7 @@ func (s *lazyPopulateChunkSeriesSet) Err() error {
 	return s.all.Err()
 }
 
-func (s *lazyPopulateChunkSeriesSet) Warnings() storage.Warnings { return nil }
+func (s *lazyPopulateChunkSeriesSet) Warnings() annotations.Annotations { return nil }
 
 type lazyPopulatableChunk struct {
 	m *chunks.Meta
@@ -110,7 +111,8 @@ func (e errChunk) Compact()                                     {}
 func (l *lazyPopulatableChunk) populate() {
 	// TODO(bwplotka): In most cases we don't need to parse anything, just copy. Extend reader/writer for this.
 	var err error
-	l.populated, err = l.cr.Chunk(*l.m)
+	// Ignore iterable as it should be nil.
+	l.populated, _, err = l.cr.ChunkOrIterable(*l.m)
 	if err != nil {
 		l.m.Chunk = errChunk{err: errChunkIterator{err: errors.Wrapf(err, "cannot populate chunk %d", l.m.Ref)}}
 		return

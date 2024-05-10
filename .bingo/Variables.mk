@@ -35,12 +35,6 @@ $(FAILLINT): $(BINGO_DIR)/faillint.mod
 	@echo "(re)installing $(GOBIN)/faillint-v1.11.0"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=faillint.mod -o=$(GOBIN)/faillint-v1.11.0 "github.com/fatih/faillint"
 
-GO_BINDATA := $(GOBIN)/go-bindata-v3.1.1+incompatible
-$(GO_BINDATA): $(BINGO_DIR)/go-bindata.mod
-	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/go-bindata-v3.1.1+incompatible"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=go-bindata.mod -o=$(GOBIN)/go-bindata-v3.1.1+incompatible "github.com/go-bindata/go-bindata/go-bindata"
-
 GOIMPORTS := $(GOBIN)/goimports-v0.12.0
 $(GOIMPORTS): $(BINGO_DIR)/goimports.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
@@ -119,11 +113,11 @@ $(PROMETHEUS): $(BINGO_DIR)/prometheus.mod
 	@echo "(re)installing $(GOBIN)/prometheus-v0.37.0"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=prometheus.mod -o=$(GOBIN)/prometheus-v0.37.0 "github.com/prometheus/prometheus/cmd/prometheus"
 
-PROMTOOL := $(GOBIN)/promtool-v0.37.0
+PROMTOOL := $(GOBIN)/promtool-v0.47.0
 $(PROMTOOL): $(BINGO_DIR)/promtool.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/promtool-v0.37.0"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=promtool.mod -o=$(GOBIN)/promtool-v0.37.0 "github.com/prometheus/prometheus/cmd/promtool"
+	@echo "(re)installing $(GOBIN)/promtool-v0.47.0"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=promtool.mod -o=$(GOBIN)/promtool-v0.47.0 "github.com/prometheus/prometheus/cmd/promtool"
 
 PROMU := $(GOBIN)/promu-v0.5.0
 $(PROMU): $(BINGO_DIR)/promu.mod

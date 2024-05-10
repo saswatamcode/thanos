@@ -176,6 +176,11 @@ Flags:
                                  If true, Store Gateway will lazy memory map
                                  index-header only once the block is required by
                                  a query.
+      --store.enable-lazy-expanded-postings
+                                 If true, Store Gateway will estimate postings
+                                 size and try to lazily expand postings if
+                                 it downloads less data than expanding all
+                                 postings.
       --store.grpc.downloaded-bytes-limit=0
                                  Maximum amount of downloaded (either
                                  fetched or touched) bytes in a single
@@ -188,6 +193,12 @@ Flags:
                                  DEPRECATED: use store.limits.request-samples.
       --store.grpc.touched-series-limit=0
                                  DEPRECATED: use store.limits.request-series.
+      --store.index-header-lazy-download-strategy=eager
+                                 Strategy of how to download index headers
+                                 lazily. Supported values: eager, lazy.
+                                 If eager, always download index header during
+                                 initial load. If lazy, download index header
+                                 during query time.
       --store.limits.request-samples=0
                                  The maximum samples allowed for a single
                                  Series request, The Series call fails if
@@ -199,7 +210,7 @@ Flags:
                                  The maximum series allowed for a single Series
                                  request. The Series call fails if this limit is
                                  exceeded. 0 means no limit.
-      --sync-block-duration=3m   Repeat interval for syncing the blocks between
+      --sync-block-duration=15m  Repeat interval for syncing the blocks between
                                  local and remote view.
       --tracing.config=<content>
                                  Alternative to 'tracing.config-file' flag
@@ -286,12 +297,16 @@ type: IN-MEMORY
 config:
   max_size: 0
   max_item_size: 0
+enabled_items: []
+ttl: 0s
 ```
 
 All the settings are **optional**:
 
 - `max_size`: overall maximum number of bytes cache can contain. The value should be specified with a bytes unit (ie. `250MB`).
 - `max_item_size`: maximum size of single item, in bytes. The value should be specified with a bytes unit (ie. `125MB`).
+- `enabled_items`: selectively choose what types of items to cache. Supported values are `Postings`, `Series` and `ExpandedPostings`. By default, all items are cached.
+- `ttl`: this field doesn't do anything for inmemory cache.
 
 ### Memcached index cache
 
@@ -310,6 +325,8 @@ config:
   max_get_multi_batch_size: 0
   dns_provider_update_interval: 0s
   auto_discovery: false
+enabled_items: []
+ttl: 0s
 ```
 
 The **required** settings are:
@@ -327,6 +344,8 @@ While the remaining settings are **optional**:
 - `max_item_size`: maximum size of an item to be stored in memcached. This option should be set to the same value of memcached `-I` flag (defaults to 1MB) in order to avoid wasting network round trips to store items larger than the max item size allowed in memcached. If set to `0`, the item size is unlimited.
 - `dns_provider_update_interval`: the DNS discovery update interval.
 - `auto_discovery`: whether to use the auto-discovery mechanism for memcached.
+- `enabled_items`: selectively choose what types of items to cache. Supported values are `Postings`, `Series` and `ExpandedPostings`. By default, all items are cached.
+- `ttl`: ttl to store index cache items in memcached.
 
 ### Redis index cache
 
@@ -357,6 +376,8 @@ config:
   master_name: ""
   max_async_buffer_size: 10000
   max_async_concurrency: 20
+enabled_items: []
+ttl: 0s
 ```
 
 The **required** settings are:
@@ -372,6 +393,8 @@ While the remaining settings are **optional**:
 - `read_timeout`: the redis read timeout.
 - `write_timeout`: the redis write timeout.
 - `cache_size` size of the in-memory cache used for client-side caching. Client-side caching is enabled when this value is not zero. See [official documentation](https://redis.io/docs/manual/client-side-caching/) for more. It is highly recommended to enable this so that Thanos Store would not need to continuously retrieve data from Redis for repeated requests of the same key(-s).
+- `enabled_items`: selectively choose what types of items to cache. Supported values are `Postings`, `Series` and `ExpandedPostings`. By default, all items are cached.
+- `ttl`: ttl to store index cache items in redis.
 
 Here is an example of what effect client-side caching could have:
 

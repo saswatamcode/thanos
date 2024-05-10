@@ -2,15 +2,22 @@ import React, { FC, useState } from 'react';
 import { Block } from './block';
 import styles from './blocks.module.css';
 import moment from 'moment';
+import PathPrefixProps from '../../../types/PathPrefixProps';
 import { Button, Modal, ModalBody, Form, Input, ModalHeader, ModalFooter } from 'reactstrap';
 import { download } from './helpers';
 
 export interface BlockDetailsProps {
   block: Block | undefined;
   selectBlock: React.Dispatch<React.SetStateAction<Block | undefined>>;
+  disableAdminOperations: boolean;
 }
 
-export const BlockDetails: FC<BlockDetailsProps> = ({ block, selectBlock }) => {
+export const BlockDetails: FC<BlockDetailsProps & PathPrefixProps> = ({
+  pathPrefix = '',
+  block,
+  selectBlock,
+  disableAdminOperations,
+}) => {
   const [modalAction, setModalAction] = useState<string>('');
   const [detailValue, setDetailValue] = useState<string | null>(null);
 
@@ -27,7 +34,7 @@ export const BlockDetails: FC<BlockDetailsProps> = ({ block, selectBlock }) => {
             action,
           });
 
-      const response = await fetch('/api/v1/blocks/mark', {
+      const response = await fetch(`${pathPrefix}/api/v1/blocks/mark`, {
         method: 'POST',
         body,
       });
@@ -100,26 +107,30 @@ export const BlockDetails: FC<BlockDetailsProps> = ({ block, selectBlock }) => {
               <Button>Download meta.json</Button>
             </a>
           </div>
-          <div style={{ marginTop: '12px' }}>
-            <Button
-              onClick={() => {
-                setModalAction('DELETION');
-                setDetailValue('');
-              }}
-            >
-              Mark Deletion
-            </Button>
-          </div>
-          <div style={{ marginTop: '12px' }}>
-            <Button
-              onClick={() => {
-                setModalAction('NO_COMPACTION');
-                setDetailValue('');
-              }}
-            >
-              Mark No Compaction
-            </Button>
-          </div>
+          {!disableAdminOperations && (
+            <div>
+              <div style={{ marginTop: '12px' }}>
+                <Button
+                  onClick={() => {
+                    setModalAction('DELETION');
+                    setDetailValue('');
+                  }}
+                >
+                  Mark Deletion
+                </Button>
+              </div>
+              <div style={{ marginTop: '12px' }}>
+                <Button
+                  onClick={() => {
+                    setModalAction('NO_COMPACTION');
+                    setDetailValue('');
+                  }}
+                >
+                  Mark No Compaction
+                </Button>
+              </div>
+            </div>
+          )}
           <Modal isOpen={!!modalAction}>
             <ModalBody>
               <ModalHeader toggle={() => setModalAction('')}>

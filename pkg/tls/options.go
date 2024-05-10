@@ -34,7 +34,7 @@ func NewServerConfig(logger log.Logger, certPath, keyPath, clientCA string) (*tl
 	}
 
 	tlsCfg := &tls.Config{
-		MinVersion: tls.VersionTLS12,
+		MinVersion: tls.VersionTLS13,
 	}
 	// Certificate is loaded during server startup to check for any errors.
 	certificate, err := tls.LoadX509KeyPair(certPath, keyPath)
