@@ -13,9 +13,11 @@ We use *breaking :warning:* to mark changes that are not backward compatible (re
 ### Fixed
 
 - [#7493](https://github.com/thanos-io/thanos/pull/7493) *: fix server grpc histograms
-* [#7511](https://github.com/thanos-io/thanos/pull/7511) Query Frontend: fix doubled gzip compression for response body.
+- [#7511](https://github.com/thanos-io/thanos/pull/7511) Query Frontend: fix doubled gzip compression for response body.
 
 ### Added
+
+- [#7429](https://github.com/thanos-io/thanos/pull/7429): Reloader: introduce `TolerateEnvVarExpansionErrors` to allow suppressing errors when expanding environment variables in the configuration file. When set, this will ensure that the reloader won't consider the operation to fail when an unset environment variable is encountered. Note that all unset environment variables are left as is, whereas all set environment variables are expanded as usual.
 
 ### Changed
 
@@ -23,7 +25,7 @@ We use *breaking :warning:* to mark changes that are not backward compatible (re
 
 ### Removed
 
-## [v0.36.0](https://github.com/thanos-io/thanos/tree/release-0.36) - in progress
+## [v0.36.0](https://github.com/thanos-io/thanos/tree/release-0.36)
 
 ### Fixed
 
@@ -34,7 +36,6 @@ We use *breaking :warning:* to mark changes that are not backward compatible (re
 
 ### Added
 
-- [#7429](https://github.com/thanos-io/thanos/pull/7429): Reloader: introduce `TolerateEnvVarExpansionErrors` to allow suppressing errors when expanding environment variables in the configuration file. When set, this will ensure that the reloader won't consider the operation to fail when an unset environment variable is encountered. Note that all unset environment variables are left as is, whereas all set environment variables are expanded as usual.
 - [#7317](https://github.com/thanos-io/thanos/pull/7317) Tracing: allow specifying resource attributes for the OTLP configuration.
 - [#7367](https://github.com/thanos-io/thanos/pull/7367) Store Gateway: log request ID in request logs.
 - [#7361](https://github.com/thanos-io/thanos/pull/7361) Query: *breaking :warning:* pass query stats from remote execution from server to client. We changed the protobuf of the QueryAPI, if you use `query.mode=distributed` you need to update your client (upper level Queriers) first, before updating leaf Queriers (servers).
