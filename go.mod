@@ -38,7 +38,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/googleapis/gax-go v2.0.2+incompatible
 	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.0.1
-	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.2
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.3
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/jpillora/backoff v1.0.0
 	github.com/json-iterator/go v1.1.12
