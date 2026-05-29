@@ -15,7 +15,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0
 	github.com/chromedp/cdproto v0.0.0-20230802225258-3cf4e6d46a89
 	github.com/chromedp/chromedp v0.9.2
-	github.com/coreos/go-systemd/v22 v22.6.0
+	github.com/coreos/go-systemd/v22 v22.7.0
 	github.com/cortexproject/promqlsmith v0.0.0-20250407233056-90db95b1a4e4
 	github.com/cristalhq/hedgedhttp v0.9.1
 	github.com/dustin/go-humanize v1.0.1
